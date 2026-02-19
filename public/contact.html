@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,15 +7,28 @@
 </head>
 <body>
   <div class="logo">🎵 New Music Hub 🎧</div>
+  <nav>
+    <a href="/">Home</a>
+    <a href="about.html">About</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+    <a href="login.html">Admin</a>
+  </nav>
 
-  <h1>Contact Us</h1>
-  <form action="/contact" method="POST">
-    <input name="name" placeholder="Your Name" required><br><br>
-    <input name="email" placeholder="Your Email" required><br><br>
-    <textarea name="message" placeholder="Message" required></textarea><br><br>
-    <button type="submit">Send Message</button>
-  </form>
+  <div class="container">
+    <h2>Contact Us</h2>
+    <div id="sent" class="small"></div>
+    <form action="/contact" method="POST" class="card">
+      <input name="name" placeholder="Your Name" required><br>
+      <input name="email" placeholder="Your Email" required><br>
+      <textarea name="message" placeholder="Message" required></textarea><br>
+      <button type="submit">Send Message</button>
+    </form>
+  </div>
 
-  <br><a href="/">Back to Home</a>
+  <script>
+    const p=new URLSearchParams(location.search);
+    if(p.get('sent')==='1'){ document.getElementById('sent').innerText="Message sent successfully!"; }
+  </script>
 </body>
 </html>

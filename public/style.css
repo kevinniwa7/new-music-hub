@@ -1,29 +1,14 @@
 
-body{
-font-family:Arial;
-text-align:center;
-background:linear-gradient(135deg,#000,#1f1c2c,#928dab);
-color:white;
-}
-.logo{font-size:32px;font-weight:bold;margin:20px;}
-.card{background:rgba(255,255,255,0.1);padding:15px;margin:15px;border-radius:10px;}
-.ad-box{
-margin:15px;
-padding:15px;
-background:rgba(255,215,0,0.2);
-border:1px solid gold;
-}
-nav {
-  margin: 15px;
-}
-
-nav a {
-  margin: 10px;
-  color: gold;
-  font-weight: bold;
-  text-decoration: none;
-}
-
-nav a:hover {
-  color: white;
-}
+body{font-family:Arial;text-align:center;background:linear-gradient(135deg,#000,#1f1c2c,#928dab);color:#fff;margin:0;padding:0;}
+.logo{font-size:32px;font-weight:800;margin:20px;}
+nav{margin:10px 0 20px;}
+nav a{margin:10px;color:gold;font-weight:bold;text-decoration:none;}
+nav a:hover{color:#fff;}
+.container{max-width:980px;margin:0 auto;padding:0 12px 30px;}
+.card{background:rgba(255,255,255,0.10);padding:15px;margin:15px auto;border-radius:12px;max-width:720px;}
+button{padding:10px 16px;background:gold;border:none;cursor:pointer;font-weight:800;border-radius:10px;}
+input,textarea{width:min(720px,92%);padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.25);margin:6px 0;}
+textarea{height:120px;}
+.ad-box{margin:15px auto;padding:14px;background:rgba(255,215,0,0.18);border:1px solid gold;border-radius:12px;max-width:720px;}
+.footer{margin:35px 0 20px;font-size:14px;opacity:0.9;}
+.small{font-size:13px;opacity:0.9}

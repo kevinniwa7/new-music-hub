@@ -2,14 +2,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="style.css">
+  <title>Admin Login - New Music Hub</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1>Admin Login</h1>
-<form action="/login" method="POST">
-<input name="username" placeholder="Username" required><br><br>
-<input type="password" name="password" placeholder="Password" required><br><br>
-<button type="submit">Login</button>
-</form>
+  <div class="logo">🎵 New Music Hub 🎧</div>
+  <nav>
+    <a href="/">Home</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+  </nav>
+
+  <div class="container">
+    <h2>Admin Login</h2>
+    <div id="err" class="small"></div>
+    <form action="/login" method="POST" class="card">
+      <input name="username" placeholder="Username" required><br>
+      <input type="password" name="password" placeholder="Password" required><br>
+      <button type="submit">Login</button>
+    </form>
+  </div>
+
+  <script>
+    const p=new URLSearchParams(location.search);
+    if(p.get('error')==='1'){ document.getElementById('err').innerText = "Wrong username or password."; }
+  </script>
 </body>
 </html>

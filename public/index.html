@@ -2,59 +2,68 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>New Music Hub</title>
-<link rel="stylesheet" href="style.css">
-
-<!-- Replace this with your real AdSense code after approval -->
-<script>
-function triggerAd(){
-    console.log("Ad impression triggered");
-}
-</script>
-
+  <title>New Music Hub</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- AFTER AdSense approval: paste your AdSense script in the <head> and replace ad boxes with your ad units -->
+  <script>
+    function triggerAdEvent(type, title){
+      console.log("Ad trigger:", type, title);
+    }
+  </script>
 </head>
 <body>
-<div class="logo">🎵 New Music Hub 🎧</div>
-<nav>
-  <a href="/">Home</a>
-  <a href="about.html">About</a>
-  <a href="contact.html">Contact</a>
-  <a href="privacy.html">Privacy</a>
-  <a href="terms.html">Terms</a>
-  <a href="login.html">Admin</a>
-</nav>
-<!-- Top Ad Placeholder -->
-<div class="ad-box">
-AD SPACE (Place AdSense Code Here)
-</div>
+  <div class="logo">🎵 New Music Hub 🎧</div>
+  <nav>
+    <a href="/">Home</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+    <a href="login.html">Admin</a>
+  </nav>
 
-<h2>Music Library</h2>
-<div id="songs"></div>
+  <div class="container">
+    <div class="ad-box">AD SPACE (Top banner — paste AdSense unit here after approval)</div>
 
-<script>
-fetch('/songs').then(res=>res.json()).then(data=>{
-    const c=document.getElementById('songs');
-    c.innerHTML='';
-    data.forEach(song=>{
-        c.innerHTML+=`
-        <div class="card">
-            <h3>${song.title}</h3>
-            <audio controls src="${song.file}" onplay="triggerAd()"></audio><br>
-            <a href="${song.file}" download onclick="triggerAd()">Download</a>
-            
-            <div class="ad-box">
-            AD SPACE (AdSense banner here)
+    <h2>Music Library</h2>
+    <div id="songs"></div>
+
+    <div class="footer">
+      <a href="privacy.html">Privacy Policy</a> |
+      <a href="terms.html">Terms & Conditions</a>
+    </div>
+  </div>
+
+  <script>
+    fetch('/songs').then(r=>r.json()).then(data=>{
+      const c=document.getElementById('songs');
+      c.innerHTML='';
+      if(!data.length){
+        c.innerHTML = "<div class='card'>No songs yet. Admin can upload or embed from YouTube.</div>";
+        return;
+      }
+      data.forEach((song)=>{
+        if(song.file){
+          c.innerHTML += `
+            <div class="card">
+              <h3>${song.title}</h3>
+              <audio controls src="${song.file}" onplay="triggerAdEvent('play','${song.title.replace(/'/g,"\'")}')"></audio><br>
+              <a href="${song.file}" download onclick="triggerAdEvent('download','${song.title.replace(/'/g,"\'")}')">Download</a>
+              <div class="ad-box">AD SPACE (In‑content ad — paste AdSense unit here)</div>
             </div>
-        </div>`;
+          `;
+        }
+        if(song.youtube){
+          c.innerHTML += `
+            <div class="card">
+              <h3>${song.title}</h3>
+              <iframe width="320" height="200" src="https://www.youtube.com/embed/${song.youtube}" frameborder="0" allowfullscreen></iframe>
+              <div class="ad-box">AD SPACE (In‑content ad — paste AdSense unit here)</div>
+            </div>
+          `;
+        }
+      });
     });
-});
-</script>
-
-
-        <footer style="margin-top:40px;">
-        <a href="privacy.html">Privacy Policy</a> |
-        <a href="terms.html">Terms & Conditions</a>
-        </footer>
-        </body>
-        
+  </script>
+</body>
 </html>
