@@ -1,12 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>About - New Music Hub</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="logo">🎵 New Music Hub 🎧</div>
+
+  <h1>About New Music Hub</h1>
+  <p>Welcome to New Music Hub — a platform for streaming and downloading music.</p>
+  <p>Contact Email: kevinniwa7@gmail.com</p>
+
+  <br><a href="/">Back to Home</a>
+</body>
+</html>
+Scroll down → click Commit changes
+
+Do the same for contact.html:
+
+open public/contact.html
+
+click edit ✏️
+
+paste:
 
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="style.css">
+  <title>Contact - New Music Hub</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1>About New Music Hub</h1>
-<p>Welcome to New Music Hub — A professional platform for uploading and streaming music.</p>
-<p>Contact Email: kevinniwa7@gmail.com</p>
+  <div class="logo">🎵 New Music Hub 🎧</div>
+
+  <h1>Contact Us</h1>
+  <form action="/contact" method="POST">
+    <input name="name" placeholder="Your Name" required><br><br>
+    <input name="email" placeholder="Your Email" required><br><br>
+    <textarea name="message" placeholder="Message" required></textarea><br><br>
+    <button type="submit">Send Message</button>
+  </form>
+
+  <br><a href="/">Back to Home</a>
 </body>
 </html>
+Commit changes.
+
+✅ 2) Make sure the links show in the menu
+Now open public/index.html → Edit ✏️
+Find the <nav> section and make it like this:
+
+<nav>
+  <a href="about.html">About</a>
+  <a href="contact.html">Contact</a>
+  <a href="privacy.html">Privacy</a>
+  <a href="terms.html">Terms</a>
+  <a href="login.html">Admin</a>
+</nav>
+Commit changes.
+
+✅ 3) Wait for Render to redeploy
+Render will automatically rebuild after each commit.
+
+Then test:
+
+/about.html
+
+/contact.html
+
+If you tell me what you see inside your public folder (just the file names), I can tell you exactly which one to edit first.
+
