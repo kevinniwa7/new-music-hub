@@ -13,3 +13,17 @@ padding:15px;
 background:rgba(255,215,0,0.2);
 border:1px solid gold;
 }
+nav {
+  margin: 15px;
+}
+
+nav a {
+  margin: 10px;
+  color: gold;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+nav a:hover {
+  color: white;
+}
