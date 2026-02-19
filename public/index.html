@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>New Music Hub</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="logo">🎵 New Music Hub 🎧</div>
+<nav>
+<a href="about.html">About</a>
+<a href="contact.html">Contact</a>
+<a href="login.html">Admin</a>
+</nav>
+<h2>Music Library</h2>
+<div id="songs"></div>
+
+<script>
+fetch('/songs').then(res => res.json()).then(data => {
+    const container = document.getElementById("songs");
+    container.innerHTML='';
+    data.forEach(song => {
+
+        if(song.file){
+            container.innerHTML += `
+            <div class="card">
+                <h3>${song.title}</h3>
+                <audio controls src="${song.file}"></audio><br>
+                <a href="${song.file}" download>Download</a>
+            </div>`;
+        }
+
+        if(song.youtube){
+            container.innerHTML += `
+            <div class="card">
+                <h3>${song.title}</h3>
+                <iframe width="300" height="200"
+                src="https://www.youtube.com/embed/${song.youtube}"
+                frameborder="0" allowfullscreen></iframe>
+            </div>`;
+        }
+
+    });
+});
+</script>
+
+</body>
+</html>

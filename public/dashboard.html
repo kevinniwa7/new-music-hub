@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>Admin Dashboard</h1>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+if(urlParams.get('upload')==='success') alert("Music uploaded successfully!");
+if(urlParams.get('embed')==='success') alert("YouTube song embedded successfully!");
+if(urlParams.get('delete')==='success') alert("Song deleted successfully!");
+if(urlParams.get('login')==='success') alert("Login successful!");
+</script>
+
+<h2>Upload MP3</h2>
+<form action="/upload" method="POST" enctype="multipart/form-data">
+<input type="text" name="title" placeholder="Song Title" required><br><br>
+<input type="file" name="music" accept="audio/*" required><br><br>
+<button type="submit">Upload Music</button>
+</form>
+
+<hr>
+
+<h2>Embed YouTube Song</h2>
+<form action="/embed" method="POST">
+<input type="text" name="title" placeholder="Song Title" required><br><br>
+<input type="text" name="youtube" placeholder="Paste YouTube Link" required><br><br>
+<button type="submit">Embed Song</button>
+</form>
+
+<hr>
+
+<h2>Current Songs</h2>
+<div id="songsList"></div>
+
+<script>
+fetch('/songs').then(res => res.json()).then(data => {
+    const container = document.getElementById("songsList");
+    container.innerHTML='';
+    data.forEach((song,i)=>{
+        let type = song.file ? "MP3" : "YouTube";
+        container.innerHTML += `<div class="card">
+            <b>${song.title}</b> (${type}) 
+            <form style="display:inline;" method="POST" action="/delete">
+            <input type="hidden" name="index" value="${i}">
+            <button type="submit">Delete</button>
+            </form>
+        </div>`;
+    });
+});
+</script>
+
+<hr>
+
+<h2>Contact Messages</h2>
+<div id="messagesList"></div>
+<script>
+fetch('/messages').then(res=>res.json()).then(data=>{
+    const container = document.getElementById("messagesList");
+    container.innerHTML='';
+    data.forEach(msg=>{
+        container.innerHTML += `<div class="card">
+            <b>${msg.name} (${msg.email})</b><br>
+            ${msg.message}
+        </div>`;
+    });
+});
+</script>
+
+<br><a href="/">Back to Home</a>
+
+</body>
+</html>

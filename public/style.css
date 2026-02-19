@@ -1,0 +1,6 @@
+
+body {font-family: Arial;text-align: center;background: linear-gradient(135deg,#000000,#1f1c2c,#928dab);color:white;}
+.logo {font-size: 32px;font-weight: bold;margin: 20px;}
+nav a {margin: 10px;color: gold;font-weight: bold;text-decoration: none;}
+.card {background: rgba(255,255,255,0.1);padding: 15px;margin: 15px;border-radius: 10px;}
+button {padding: 8px 15px;background: gold;border: none;cursor: pointer;font-weight: bold;}
