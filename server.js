@@ -6,18 +6,31 @@ const multer = require("multer");
 const session = require("express-session");
 
 const app = express();
+app.set("trust proxy", 1);
+
 const PORT = process.env.PORT || 3000;
+
+const UPLOAD_DIR = path.join(__dirname, "uploads");
+const DATA_DIR = path.join(__dirname, "data");
+const SONGS_PATH = path.join(DATA_DIR, "songs.json");
+const MESSAGES_PATH = path.join(DATA_DIR, "messages.json");
+
+fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+fs.mkdirSync(DATA_DIR, { recursive: true });
+if (!fs.existsSync(SONGS_PATH)) fs.writeFileSync(SONGS_PATH, "[]");
+if (!fs.existsSync(MESSAGES_PATH)) fs.writeFileSync(MESSAGES_PATH, "[]");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use(express.static("public"));
-app.use("/uploads", express.static("uploads"));
+app.use(express.static(path.join(__dirname, "public")));
+app.use("/uploads", express.static(UPLOAD_DIR));
 
 app.use(session({
   secret: process.env.SESSION_SECRET || "newMusicHubSecret",
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: { httpOnly: true, sameSite: "lax", secure: "auto" }
 }));
 
 const USERNAME = "Kingo Records";
@@ -29,10 +42,13 @@ function checkAuth(req, res, next) {
 }
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/"),
+  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
   filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname)
 });
-const upload = multer({ storage });
+const upload = multer({ storage, limits: { fileSize: 200 * 1024 * 1024 } });
+
+function readJsonSafe(p) { try { return JSON.parse(fs.readFileSync(p, "utf8")); } catch { return []; } }
+function writeJsonSafe(p, o) { fs.writeFileSync(p, JSON.stringify(o, null, 2)); }
 
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
@@ -43,93 +59,76 @@ app.post("/login", (req, res) => {
   return res.redirect("/login.html?error=1");
 });
 
-app.get("/logout", (req, res) => {
-  req.session.destroy(() => res.redirect("/"));
-});
+app.get("/logout", (req, res) => req.session.destroy(() => res.redirect("/")));
 
-app.post("/upload", checkAuth, upload.single("music"), (req, res) => {
-  if (!req.file) return res.redirect("/dashboard.html?upload=nofile");
-
-  const songsPath = path.join(__dirname, "data/songs.json");
-  const songs = JSON.parse(fs.readFileSync(songsPath, "utf8"));
-
-  songs.push({
-    title: req.body.title || req.file.originalname,
-    file: "/uploads/" + req.file.filename
+app.post("/upload", checkAuth, (req, res) => {
+  upload.single("music")(req, res, (err) => {
+    if (err) {
+      console.error("UPLOAD ERROR:", err);
+      return res.redirect("/dashboard.html?upload=error");
+    }
+    if (!req.file) return res.redirect("/dashboard.html?upload=nofile");
+    const songs = readJsonSafe(SONGS_PATH);
+    songs.push({ title: req.body.title || req.file.originalname, file: "/uploads/" + req.file.filename });
+    try { writeJsonSafe(SONGS_PATH, songs); } catch (e) { console.error("WRITE ERROR:", e); return res.redirect("/dashboard.html?upload=error"); }
+    return res.redirect("/dashboard.html?upload=success");
   });
-
-  fs.writeFileSync(songsPath, JSON.stringify(songs, null, 2));
-  return res.redirect("/dashboard.html?upload=success");
 });
 
 app.post("/embed", checkAuth, (req, res) => {
-  const { title, youtube } = req.body;
-  let videoId = "";
-
-  if (youtube && youtube.includes("watch?v=")) {
-    videoId = youtube.split("watch?v=")[1].split("&")[0];
-  } else if (youtube && youtube.includes("youtu.be/")) {
-    videoId = youtube.split("youtu.be/")[1].split("?")[0];
-  } else if (youtube && youtube.includes("youtube.com/embed/")) {
-    videoId = youtube.split("youtube.com/embed/")[1].split("?")[0];
+  try {
+    const { title, youtube } = req.body;
+    let videoId = "";
+    if (youtube && youtube.includes("watch?v=")) videoId = youtube.split("watch?v=")[1].split("&")[0];
+    else if (youtube && youtube.includes("youtu.be/")) videoId = youtube.split("youtu.be/")[1].split("?")[0];
+    else if (youtube && youtube.includes("youtube.com/embed/")) videoId = youtube.split("youtube.com/embed/")[1].split("?")[0];
+    if (!videoId) return res.redirect("/dashboard.html?embed=badlink");
+    const songs = readJsonSafe(SONGS_PATH);
+    songs.push({ title: title || "YouTube Track", youtube: videoId });
+    writeJsonSafe(SONGS_PATH, songs);
+    return res.redirect("/dashboard.html?embed=success");
+  } catch (e) {
+    console.error("EMBED ERROR:", e);
+    return res.redirect("/dashboard.html?embed=error");
   }
-
-  if (!videoId) return res.redirect("/dashboard.html?embed=badlink");
-
-  const songsPath = path.join(__dirname, "data/songs.json");
-  const songs = JSON.parse(fs.readFileSync(songsPath, "utf8"));
-
-  songs.push({ title: title || "YouTube Track", youtube: videoId });
-
-  fs.writeFileSync(songsPath, JSON.stringify(songs, null, 2));
-  return res.redirect("/dashboard.html?embed=success");
 });
 
 app.post("/delete", checkAuth, (req, res) => {
-  const index = parseInt(req.body.index, 10);
-  const songsPath = path.join(__dirname, "data/songs.json");
-  let songs = JSON.parse(fs.readFileSync(songsPath, "utf8"));
-
-  if (Number.isNaN(index) || index < 0 || index >= songs.length) {
-    return res.redirect("/dashboard.html?delete=badindex");
-  }
-
-  const song = songs[index];
-  if (song && song.file) {
-    const localPath = path.join(__dirname, song.file);
-    if (fs.existsSync(localPath)) {
-      try { fs.unlinkSync(localPath); } catch(e) {}
+  try {
+    const index = parseInt(req.body.index, 10);
+    let songs = readJsonSafe(SONGS_PATH);
+    if (Number.isNaN(index) || index < 0 || index >= songs.length) return res.redirect("/dashboard.html?delete=badindex");
+    const song = songs[index];
+    if (song && song.file) {
+      const rel = song.file.startsWith("/") ? song.file.slice(1) : song.file;
+      const localPath = path.join(__dirname, rel);
+      if (fs.existsSync(localPath)) { try { fs.unlinkSync(localPath); } catch(e) {} }
     }
+    songs.splice(index, 1);
+    writeJsonSafe(SONGS_PATH, songs);
+    return res.redirect("/dashboard.html?delete=success");
+  } catch (e) {
+    console.error("DELETE ERROR:", e);
+    return res.redirect("/dashboard.html?delete=error");
   }
-
-  songs.splice(index, 1);
-  fs.writeFileSync(songsPath, JSON.stringify(songs, null, 2));
-  return res.redirect("/dashboard.html?delete=success");
 });
 
-app.get("/songs", (req, res) => {
-  const songs = JSON.parse(fs.readFileSync(path.join(__dirname, "data/songs.json"), "utf8"));
-  res.json(songs);
-});
+app.get("/songs", (req, res) => res.json(readJsonSafe(SONGS_PATH)));
 
 app.post("/contact", (req, res) => {
-  const messagesPath = path.join(__dirname, "data/messages.json");
-  const messages = JSON.parse(fs.readFileSync(messagesPath, "utf8"));
-
-  messages.push({
-    name: req.body.name || "",
-    email: req.body.email || "",
-    message: req.body.message || "",
-    time: new Date().toISOString()
-  });
-
-  fs.writeFileSync(messagesPath, JSON.stringify(messages, null, 2));
-  res.redirect("/contact.html?sent=1");
+  try {
+    const messages = readJsonSafe(MESSAGES_PATH);
+    messages.push({ name: req.body.name || "", email: req.body.email || "", message: req.body.message || "", time: new Date().toISOString() });
+    writeJsonSafe(MESSAGES_PATH, messages);
+    res.redirect("/contact.html?sent=1");
+  } catch (e) {
+    console.error("CONTACT ERROR:", e);
+    res.redirect("/contact.html?sent=0");
+  }
 });
 
-app.get("/messages", checkAuth, (req, res) => {
-  const messages = JSON.parse(fs.readFileSync(path.join(__dirname, "data/messages.json"), "utf8"));
-  res.json(messages);
-});
+app.get("/messages", checkAuth, (req, res) => res.json(readJsonSafe(MESSAGES_PATH)));
+
+app.get("/health", (req, res) => res.send("ok"));
 
 app.listen(PORT, () => console.log("Running on port " + PORT));

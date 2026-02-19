@@ -1,93 +1,47 @@
-
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Dashboard - New Music Hub</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div class="logo">🎵 New Music Hub 🎧</div>
-  <nav>
-    <a href="/">Home</a>
-    <a href="/logout">Logout</a>
-  </nav>
-
-  <div class="container">
-    <h2>Admin Dashboard</h2>
-    <div id="msg" class="small"></div>
-
-    <div class="card">
-      <h3>Upload MP3</h3>
-      <form action="/upload" method="POST" enctype="multipart/form-data">
-        <input type="text" name="title" placeholder="Song Title" required><br>
-        <input type="file" name="music" accept="audio/*" required><br>
-        <button type="submit">Upload</button>
-      </form>
-      <p class="small">Note: On free Render hosting, uploaded MP3 files may disappear if the server restarts. Later we’ll connect AWS/Firebase for permanent storage.</p>
-    </div>
-
-    <div class="card">
-      <h3>Embed YouTube</h3>
-      <form action="/embed" method="POST">
-        <input type="text" name="title" placeholder="Song Title" required><br>
-        <input type="text" name="youtube" placeholder="YouTube link (watch?v=... or youtu.be/...)" required><br>
-        <button type="submit">Embed</button>
-      </form>
-    </div>
-
-    <div class="card">
-      <h3>Current Songs</h3>
-      <div id="songsList"></div>
-    </div>
-
-    <div class="card">
-      <h3>Contact Messages</h3>
-      <div id="messagesList"></div>
-    </div>
-  </div>
-
-  <script>
-    const p=new URLSearchParams(location.search);
-    const m=document.getElementById('msg');
-    if(p.get('login')==='success') m.innerText="Login successful.";
-    if(p.get('upload')==='success') m.innerText="Upload successful.";
-    if(p.get('upload')==='nofile') m.innerText="No file selected.";
-    if(p.get('embed')==='success') m.innerText="YouTube embed saved.";
-    if(p.get('embed')==='badlink') m.innerText="Invalid YouTube link.";
-    if(p.get('delete')==='success') m.innerText="Song deleted.";
-
-    fetch('/songs').then(r=>r.json()).then(data=>{
-      const c=document.getElementById('songsList');
-      c.innerHTML='';
-      data.forEach((song,i)=>{
-        const type = song.file ? "MP3" : "YouTube";
-        c.innerHTML += `
-          <div class="card" style="max-width:720px;">
-            <b>${song.title}</b> <span class="small">(${type})</span><br>
-            <form method="POST" action="/delete" style="margin-top:8px;">
-              <input type="hidden" name="index" value="${i}">
-              <button type="submit">Delete</button>
-            </form>
-          </div>
-        `;
-      });
-      if(!data.length) c.innerHTML="<div class='small'>No songs yet.</div>";
-    });
-
-    fetch('/messages').then(r=>r.json()).then(data=>{
-      const c=document.getElementById('messagesList');
-      c.innerHTML='';
-      data.reverse().forEach(msg=>{
-        c.innerHTML += `
-          <div class="card" style="max-width:720px;">
-            <b>${msg.name} (${msg.email})</b><br>
-            <span class="small">${msg.time || ""}</span><br><br>
-            ${msg.message}
-          </div>
-        `;
-      });
-      if(!data.length) c.innerHTML="<div class='small'>No messages yet.</div>";
-    });
-  </script>
-</body>
-</html>
+<!DOCTYPE html><html><head><title>Dashboard - New Music Hub</title><link rel="stylesheet" href="style.css"></head>
+<body><div class="logo">🎵 New Music Hub 🎧</div><nav><a href="/">Home</a><a href="/logout">Logout</a></nav>
+<div class="container"><h2>Admin Dashboard</h2><div id="msg" class="small"></div>
+<div class="card"><h3>Upload MP3</h3>
+<form action="/upload" method="POST" enctype="multipart/form-data">
+<input type="text" name="title" placeholder="Song Title" required>
+<input type="file" name="music" accept="audio/*" required>
+<button type="submit">Upload</button></form>
+<p class="small">Note: On free Render hosting, uploaded MP3 files may disappear if the server restarts.</p></div>
+<div class="card"><h3>Embed YouTube</h3>
+<form action="/embed" method="POST">
+<input type="text" name="title" placeholder="Song Title" required>
+<input type="text" name="youtube" placeholder="YouTube link (watch?v=... or youtu.be/...)" required>
+<button type="submit">Embed</button></form></div>
+<div class="card"><h3>Current Songs</h3><div id="songsList"></div></div>
+<div class="card"><h3>Contact Messages</h3><div id="messagesList"></div></div></div>
+<script>
+const p=new URLSearchParams(location.search); const m=document.getElementById('msg');
+if(p.get('login')==='success') m.innerText="Login successful.";
+if(p.get('upload')==='success') m.innerText="Upload successful.";
+if(p.get('upload')==='nofile') m.innerText="No file selected.";
+if(p.get('upload')==='error') m.innerText="Upload failed (server error).";
+if(p.get('embed')==='success') m.innerText="YouTube embed saved.";
+if(p.get('embed')==='badlink') m.innerText="Invalid YouTube link.";
+if(p.get('embed')==='error') m.innerText="Embed failed (server error).";
+if(p.get('delete')==='success') m.innerText="Song deleted.";
+if(p.get('delete')==='error') m.innerText="Delete failed (server error).";
+fetch('/songs').then(r=>r.json()).then(data=>{
+  const c=document.getElementById('songsList'); c.innerHTML='';
+  if(!data.length){ c.innerHTML="<div class='small'>No songs yet.</div>"; return; }
+  data.forEach((song,i)=>{
+    const type=song.file?"MP3":"YouTube";
+    c.innerHTML += `<div class="card" style="max-width:720px;"><b>${song.title}</b> <span class="small">(${type})</span>
+      <form method="POST" action="/delete" style="margin-top:8px;">
+        <input type="hidden" name="index" value="${i}">
+        <button type="submit">Delete</button>
+      </form></div>`;
+  });
+});
+fetch('/messages').then(r=>r.json()).then(data=>{
+  const c=document.getElementById('messagesList'); c.innerHTML='';
+  if(!data.length){ c.innerHTML="<div class='small'>No messages yet.</div>"; return; }
+  data.reverse().forEach(msg=>{
+    c.innerHTML += `<div class="card" style="max-width:720px;"><b>${msg.name} (${msg.email})</b><br><span class="small">${msg.time||""}</span><br><br>${msg.message}</div>`;
+  });
+});
+</script></body></html>

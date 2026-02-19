@@ -1,6 +1,6 @@
 {
-  "name": "new-music-hub-render-full",
-  "version": "1.0.0",
+  "name": "new-music-hub-render-full-fixed",
+  "version": "1.0.1",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
