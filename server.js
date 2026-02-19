@@ -113,6 +113,17 @@ app.post("/delete", checkAuth, (req, res) => {
   }
 });
 
+
+// Blog posts (public)
+app.get("/posts", (req, res) => {
+  try {
+    const posts = JSON.parse(fs.readFileSync(path.join(__dirname, "data/posts.json"), "utf8"));
+    res.json(posts);
+  } catch (e) {
+    res.json([]);
+  }
+});
+
 app.get("/songs", (req, res) => res.json(readJsonSafe(SONGS_PATH)));
 
 app.post("/contact", (req, res) => {

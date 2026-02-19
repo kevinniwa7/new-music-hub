@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Blog - New Music Hub</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="logo">🎵 New Music Hub 🎧</div>
+  <nav>
+    <a href="/">Home</a>
+    <a href="blog.html">Blog</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+    <a href="login.html">Admin</a>
+  </nav>
+
+  <div class="container">
+    <h2>Blog</h2>
+    <div id="posts"></div>
+  </div>
+
+  <script>
+    fetch('/posts').then(r=>r.json()).then(posts=>{
+      const wrap = document.getElementById('posts');
+      wrap.innerHTML='';
+      posts.sort((a,b)=> (b.date||'').localeCompare(a.date||''));
+      posts.forEach(p=>{
+        wrap.innerHTML += `
+          <div class="card">
+            <h3>${p.title}</h3>
+            <div class="small">${p.date || ''}</div>
+            <p>${p.summary || ''}</p>
+            <a href="post.html?slug=${encodeURIComponent(p.slug)}">Read more</a>
+          </div>
+        `;
+      });
+    });
+  </script>
+</body>
+</html>

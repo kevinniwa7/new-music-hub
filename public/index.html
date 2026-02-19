@@ -2,7 +2,7 @@
 <script>function triggerAdEvent(type,title){console.log("Ad trigger:",type,title);}</script></head><body>
 <div class="logo">🎵 New Music Hub 🎧</div>
 <nav><a href="/">Home</a><a href="about.html">About</a><a href="contact.html">Contact</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="login.html">Admin</a></nav>
-<div class="container"><div class="ad-box">AD SPACE (Top banner — paste AdSense unit here after approval)</div>
+<div class="container">
 <h2>Music Library</h2><div id="songs"></div>
 <div class="footer"><a href="privacy.html">Privacy Policy</a> | <a href="terms.html">Terms & Conditions</a></div></div>
 <script>
@@ -14,13 +14,37 @@ fetch('/songs').then(r=>r.json()).then(data=>{
       c.innerHTML += `<div class="card"><h3>${song.title}</h3>
         <audio controls src="${song.file}" onplay="triggerAdEvent('play', song.title)"></audio><br>
         <a href="${song.file}" download onclick="triggerAdEvent('download', song.title)">Download</a>
-        <div class="ad-box">AD SPACE (In‑content ad)</div></div>`;
+        </div>`;
     }
     if(song.youtube){
       c.innerHTML += `<div class="card"><h3>${song.title}</h3>
         <iframe width="320" height="200" src="https://www.youtube.com/embed/${song.youtube}" frameborder="0" allowfullscreen></iframe>
-        <div class="ad-box">AD SPACE (In‑content ad)</div></div>`;
+        </div>`;
     }
   });
 });
-</script></body></html>
+</script>
+<div id="cookieBanner" class="card" style="max-width:720px; position:fixed; left:50%; transform:translateX(-50%); bottom:12px; z-index:9999;">
+  <b>Cookies</b>
+  <div class="small" style="margin-top:6px;">
+    We use cookies to improve your experience and to support advertising when enabled. See our <a href="privacy.html">Privacy Policy</a>.
+  </div>
+  <div style="margin-top:10px;">
+    <button onclick="acceptCookies()">Accept</button>
+  </div>
+</div>
+<script>
+  function acceptCookies(){
+    localStorage.setItem('nmh_cookie_ok','1');
+    const b=document.getElementById('cookieBanner');
+    if(b) b.remove();
+  }
+  (function(){
+    if(localStorage.getItem('nmh_cookie_ok')==='1'){
+      const b=document.getElementById('cookieBanner');
+      if(b) b.remove();
+    }
+  })();
+</script>
+
+</body></html>

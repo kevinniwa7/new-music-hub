@@ -1,0 +1,35 @@
+[
+  {
+    "slug": "welcome-to-new-music-hub",
+    "title": "Welcome to New Music Hub",
+    "date": "2026-02-19",
+    "summary": "What New Music Hub is, what we publish, and how to enjoy music safely and legally.",
+    "content": [
+      "New Music Hub is a place to discover, stream, and download music shared by our team.",
+      "We focus on supporting creators and promoting music that is shared with the right permissions.",
+      "If you are an artist and want to feature your music, use our Contact page to reach us."
+    ]
+  },
+  {
+    "slug": "how-to-download-music-safely",
+    "title": "How to Download Music Safely",
+    "date": "2026-02-19",
+    "summary": "Simple tips for safe downloads and respecting artist rights.",
+    "content": [
+      "Only download music you have permission to use. Respect copyright and the work of artists.",
+      "Keep your device safe: download from trusted sources and scan files if your device supports it.",
+      "If you find any content you believe should not be on this site, contact us and we will review it."
+    ]
+  },
+  {
+    "slug": "supporting-artists",
+    "title": "Supporting Artists: Why It Matters",
+    "date": "2026-02-19",
+    "summary": "Streaming is great \u2014 here are practical ways to support the artists you love.",
+    "content": [
+      "Follow artists on social platforms and share their music.",
+      "Attend live shows when possible and buy official merchandise.",
+      "If an artist offers direct downloads or subscriptions, that is one of the best ways to support them."
+    ]
+  }
+]

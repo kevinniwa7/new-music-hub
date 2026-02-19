@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Post - New Music Hub</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="logo">🎵 New Music Hub 🎧</div>
+  <nav>
+    <a href="/">Home</a>
+    <a href="blog.html">Blog</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+  </nav>
+
+  <div class="container">
+    <div class="card">
+      <h2 id="title">Loading...</h2>
+      <div class="small" id="date"></div>
+      <div id="content"></div>
+    </div>
+  </div>
+
+  <script>
+    const slug = new URLSearchParams(location.search).get('slug');
+    fetch('/posts').then(r=>r.json()).then(posts=>{
+      const p = posts.find(x=>x.slug===slug);
+      if(!p){ document.getElementById('title').innerText='Post not found'; return; }
+      document.title = p.title + " - New Music Hub";
+      document.getElementById('title').innerText = p.title;
+      document.getElementById('date').innerText = p.date || '';
+      const c = document.getElementById('content');
+      c.innerHTML = '';
+      (p.content||[]).forEach(par=>{
+        const el = document.createElement('p');
+        el.innerText = par;
+        c.appendChild(el);
+      });
+    });
+  </script>
+</body>
+</html>
